@@ -22,6 +22,7 @@ var (
 	generateIstioVSServicePort      int32
 	generateIstioVSGateways         []string
 	generateIstioVSPrefixMatch      bool
+	generateIstioVSMatchRegex       bool
 )
 
 func generateIstioVirtualServiceCommand() *cobra.Command {
@@ -73,7 +74,8 @@ func generateIstioVirtualServiceCommand() *cobra.Command {
 	}
 
 	// exact match
-	cmd.Flags().BoolVar(&generateIstioVSPrefixMatch, "path-prefix-match", false, "Path match type (defaults to exact match type)")
+	cmd.Flags().BoolVar(&generateIstioVSPrefixMatch, "path-prefix-match", false, "Path match type Prefix (defaults to exact match type)")
+	cmd.Flags().BoolVar(&generateIstioVSMatchRegex, "path-regex-match", false, "Path match type Regex (defaults to exact match type)")
 
 	return cmd
 }
@@ -120,7 +122,7 @@ func generateIstioVirtualService(cmd *cobra.Command, doc *openapi3.T) (*istionet
 		Port: &istionetworkingapi.PortSelector{Number: uint32(generateIstioVSServicePort)},
 	}
 
-	httpRoutes, err := istioutils.HTTPRoutesFromOpenAPI(doc, destination, generateIstioVSPrefixMatch)
+	httpRoutes, err := istioutils.HTTPRoutesFromOpenAPI(doc, destination, generateIstioVSPrefixMatch, generateIstioVSMatchRegex)
 	if err != nil {
 		return nil, err
 	}
